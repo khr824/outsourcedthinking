@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player Experience</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .content-area {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            color: #444;
+        }
+
+        .player-controls {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Progress Slider Styling */
+        input[type="range"] {
+            width: 100%;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        button:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stop-btn {
+            background: #ef4444;
+        }
+
+        .stop-btn:hover {
+            background: #dc2626;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="content-area">
+        <h2>Welcome</h2>
+        <p>This is the text from your attachment. Enjoy the audio experience below with full playback control.</p>
+    </div>
+
+    <audio id="myAudio" src="audio1.mp3"></audio>
+
+    <div class="player-controls">
+        <input type="range" id="progressBar" value="0" step="1">
+        
+        <div class="button-group">
+            <button onclick="playAudio()">Play</button>
+            <button onclick="pauseAudio()">Pause</button>
+            <button class="stop-btn" onclick="stopAudio()">Stop</button>
+        </div>
+
+        <div class="volume-container">
+            <span>Volume</span>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+        </div>
+    </div>
+</div>
+
+<script>
+    const audio = document.getElementById('myAudio');
+    const progressBar = document.getElementById('progressBar');
+    const volumeSlider = document.getElementById('volumeSlider');
+
+    // Play/Resume
+    function playAudio() {
+        audio.play();
+    }
+
+    // Pause
+    function pauseAudio() {
+        audio.pause();
+    }
+
+    // Stop (Pause + Reset time)
+    function stopAudio() {
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
+    // Update Progress Bar as audio plays
+    audio.addEventListener('timeupdate', () => {
+        if (audio.duration) {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.value = progress;
+        }
+    });
+
+    // Seek functionality
+    progressBar.addEventListener('input', () => {
+        const seekTime = (progressBar.value / 100) * audio.duration;
+        audio.currentTime = seekTime;
+    });
+
+    // Volume Control
+    volumeSlider.addEventListener('input', (e) => {
+        audio.volume = e.target.value;
+    });
+
+    // Ensure slider max updates when metadata loads
+    audio.addEventListener('loadedmetadata', () => {
+        progressBar.max = 100;
+    });
+</script>
+
+</body>
+</html>
