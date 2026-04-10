@@ -3,171 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Player Experience</title>
+    <title>Stop Outsourcing Your Thinking</title>
     <style>
         :root {
-            --primary: #6366f1;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --card-bg: rgba(255, 255, 255, 0.9);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --player-bg: #ffffff;
+            --border-radius: 12px;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-main);
+            background-color: var(--bg-color);
             margin: 0;
-            color: #333;
+            padding: 0;
+            padding-bottom: 120px; /* Space for the fixed audio player */
         }
 
-        .container {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 500px;
+        header {
             text-align: center;
-        }
-
-        .content-area {
-            margin-bottom: 2rem;
-            line-height: 1.6;
-            font-size: 1.1rem;
-            color: #444;
-        }
-
-        .player-controls {
+            padding: 3rem 1rem;
             background: #fff;
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
         }
 
-        /* Progress Slider Styling */
-        input[type="range"] {
-            width: 100%;
-            margin: 15px 0;
-            cursor: pointer;
+        h1 {
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.2;
         }
 
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+        .author-meta {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        h2 {
+            margin-top: 2.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        h3 {
+            margin-top: 2rem;
+            color: #334155;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+        }
+
+        ul {
             margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .citation {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            vertical-align: super;
+        }
+
+        /* Custom Audio Player Styles */
+        .audio-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            background: var(--player-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+            border: 1px solid #e2e8f0;
+        }
+
+        .player-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
         }
 
         button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            background: var(--primary);
+            background-color: var(--primary);
             color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
         }
 
         button:hover {
-            background: #4f46e5;
-            transform: translateY(-2px);
+            background-color: var(--primary-hover);
         }
 
         button:active {
-            transform: translateY(0);
+            transform: scale(0.98);
         }
 
-        .stop-btn {
-            background: #ef4444;
-        }
-
-        .stop-btn:hover {
-            background: #dc2626;
-        }
-
-        .volume-container {
+        .slider-group {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: #666;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            flex-grow: 1;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: -4px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 120px;
+        }
+        
+        .volume-icon {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 600px) {
+            .player-top-row {
+                flex-direction: column;
+            }
+            .volume-control {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="content-area">
-        <h2>Welcome</h2>
-        <p>This is the text from your attachment. Enjoy the audio experience below with full playback control.</p>
-    </div>
+    <header>
+        <h1>Stop Outsourcing Your Thinking (Start From First Principles) <span class="citation">[cite: 1]</span></h1>
+        <div class="author-meta">By Sam Matla <span class="citation">[cite: 2]</span> | Category: Personal Development <span class="citation">[cite: 3]</span></div>
+    </header>
 
-    <audio id="myAudio" src="audio1.mp3"></audio>
+    <main>
+        <p>A few years back I was thinking about where I wanted to live <span class="citation">[cite: 4]</span>. Specifically, whether I wanted to move to the city, stay in the suburbs, or buy some land further out in the country <span class="citation">[cite: 5]</span>. Now, when I say I was thinking about where to live-I wasn't. I wasn't thinking at all <span class="citation">[cite: 6]</span>. In fact, the first thing I did when "thinking" about this was go straight to Google and type in "city vs country living reddit" <span class="citation">[cite: 7]</span>. And it was at that moment that I realized something. I have a bad habit of outsourcing my thinking <span class="citation">[cite: 8]</span>. Let's call it "lazy thinking." <span class="citation">[cite: 9]</span></p>
 
-    <div class="player-controls">
-        <input type="range" id="progressBar" value="0" step="1">
+        <p>There's nothing wrong with leveraging the internet to make better decisions <span class="citation">[cite: 10]</span>. Travelling, and want to visit some lesser-known attractions? Ask Google <span class="citation">[cite: 11]</span>. Not sure what TV to buy? Internet can help you <span class="citation">[cite: 12]</span>. But then there are decisions that aren't as easily answered, or benefit greatly from some first principles thinking done on your part <span class="citation">[cite: 13]</span>.</p>
+
+        <p>Decisions such as: <span class="citation">[cite: 14]</span></p>
+        <ul>
+            <li>How should I solve this problem I have with an employee or boss? <span class="citation">[cite: 15]</span></li>
+            <li>Should I have kids? <span class="citation">[cite: 16]</span></li>
+            <li>Where should I live? <span class="citation">[cite: 17]</span></li>
+            <li>How should I structure my daily routine? <span class="citation">[cite: 18]</span></li>
+        </ul>
+        <p>And so on <span class="citation">[cite: 19]</span>.</p>
+
+        <p>Seeking the advice and opinion of others can aid you in making these decisions and answering these questions, but the problem arises when we default to seeking advice as the first step-and often relying on it entirely and completely, only to end up disappointed later on <span class="citation">[cite: 20]</span>. And there are two reasons why this is a problem <span class="citation">[cite: 21]</span>.</p>
+
+        <p>First, it encourages lazy thinking. Which is a bad habit <span class="citation">[cite: 22]</span>. If you never truly sit down and think through problems and decisions, you never develop the skill of thinking and decision making <span class="citation">[cite: 23]</span>. Lazy thinking will likely lead to poor decision making over time which leads to worse outcomes for you <span class="citation">[cite: 24]</span>.</p>
+
+        <p>Second, it gets you average results and answers. If you're seeking the collective opinion and insights of others, you will get the average <span class="citation">[cite: 25]</span>. And that average might be correct. It might even be ideal <span class="citation">[cite: 26]</span>. But many decisions-such as business problems that need to be solved, or how you should structure your daily routine-are unique <span class="citation">[cite: 27]</span>. And an above average answer or solution that comes from engaging in deep thinking can lead to much better outcomes <span class="citation">[cite: 28]</span>. Most of the time, we already know what to do (or we know enough to figure it out) <span class="citation">[cite: 29]</span>.</p>
+
+        <p>Unless you're an infant watching this-in which case you won't be able to understand a word I'm saying anyway-you have a wealth of knowledge and experience that you've built up over the years <span class="citation">[cite: 30]</span>. When you habitually and instinctively outsource your decision making, you fail to leverage this experience and knowledge <span class="citation">[cite: 31]</span>. But when you start by engaging in intentional thinking, you do <span class="citation">[cite: 32]</span>. Because the truth is, with most decisions-especially smaller ones-you already know what to do <span class="citation">[cite: 33]</span>. And if you don't know what to do, you likely have enough experience and knowledge to think through the problem or decision that's in front of you <span class="citation">[cite: 34]</span>.</p>
+
+        <p>For example, when it came to the moving decision, I was confused and paralyzed for so long <span class="citation">[cite: 35]</span>. All I'd done was outsource my thinking and read other people's opinions <span class="citation">[cite: 36]</span>. It wasn't until I sat down and actually thought through the decision that I came to some degree of clarity <span class="citation">[cite: 37]</span>.</p>
+        <ul>
+            <li>I'd lived in both the city and out in the country in the past, and there were aspects of both that I liked and disliked which I could think about <span class="citation">[cite: 38]</span>.</li>
+            <li>I looked ahead at the next 3-5 years and thought about what was important to me and my family <span class="citation">[cite: 39]</span>.</li>
+            <li>I took business and network effects into account (being closer to a major city has its benefits) <span class="citation">[cite: 40]</span>.</li>
+        </ul>
+        <p>And so on and so on <span class="citation">[cite: 41]</span>.</p>
+
+        <p>This "original" thinking, drawing from my own experiences and insights, was far more useful to me than going straight to Google and seeking other people's opinions <span class="citation">[cite: 42]</span>. Sure, there will be times where you neither know what to do nor have the knowledge or experience to even think through it properly <span class="citation">[cite: 43]</span>. But most of the time, you do. The reason you choose not to engage in the thinking is because it's hard and requires lots of self-awareness and introspection, which can often be uncomfortable <span class="citation">[cite: 44]</span>.</p>
+
+        <h2>The High Impact Decisions Almost Always Require Real Thinking <span class="citation">[cite: 45]</span></h2>
+        <p>There are questions, problems and decisions that can easily be solved by Google or ChatGPT <span class="citation">[cite: 46]</span>. "What recipes can I cook with these ingredients?" <span class="citation">[cite: 47]</span> "Which model of car is more reliable?" <span class="citation">[cite: 48]</span> "Which career options offer reasonable pay without insane work hours?" <span class="citation">[cite: 49]</span> But many high impact decisions require you to actually think <span class="citation">[cite: 50]</span>. "How do I best balance the goals I have?" <span class="citation">[cite: 51]</span> "Which goals should I even set?" <span class="citation">[cite: 52]</span> "Should I spend more time on my business this year, or more time with my family?" <span class="citation">[cite: 53]</span> "What should I study?" <span class="citation">[cite: 54]</span> You get the idea. These are decisions that can only truly be answered by you, ideally with much of your original thought and some helpful advice and opinions from others to help shape your thinking <span class="citation">[cite: 55]</span>.</p>
+
+        <h2>What to do instead <span class="citation">[cite: 56]</span></h2>
+        <p>The answer is not to avoid using Google, ChatGPT or asking the advice of others <span class="citation">[cite: 57]</span>. It's amazing that we have access to these tools and other people to help us. Ignoring these is also stupid <span class="citation">[cite: 58]</span>. The answer is to engage in intentional thinking first. Particularly when the problem or decision you're facing calls for it <span class="citation">[cite: 59]</span>. Here's how you can do just that... <span class="citation">[cite: 60]</span></p>
+
+        <h3>Use pen and paper <span class="citation">[cite: 61]</span></h3>
+        <p>I know. Your note-taking app probably has a cool canvas mode or whiteboard and it helps you think better and so on and so on <span class="citation">[cite: 62]</span>. But it's too easy to get distracted. It's too easy to see what Reddit thinks <span class="citation">[cite: 63]</span>. Get away from your laptop. Get away from your phone. Use pen and paper <span class="citation">[cite: 64]</span>. You are trying to work with just your mind, what you know <span class="citation">[cite: 65]</span>. Read: In Defense of Pen & Paper <span class="citation">[cite: 66]</span>.</p>
+
+        <h3>Work from first principles (or at least get as close as needed) <span class="citation">[cite: 67]</span></h3>
+        <p>The alternative title for this tip is to ask yourself probing questions <span class="citation">[cite: 68]</span>. When engaging in this type of thinking, you want to get as close as possible to the fundamental truths of the problem or decision you're faced with <span class="citation">[cite: 69]</span>. Let's say I have an employee that's causing tension in the business and I'm not sure how to address it <span class="citation">[cite: 70]</span>. Sometimes I get angry and think he should just be let go <span class="citation">[cite: 71]</span>. Other times I think I should give him a second chance <span class="citation">[cite: 72]</span>. Well, I want to start by thinking about the first principles: <span class="citation">[cite: 73]</span></p>
+        <ul>
+            <li>Is he actually causing tension? Or do I just think he is? <span class="citation">[cite: 74]</span></li>
+            <li>What is actually causing that tension? <span class="citation">[cite: 75]</span></li>
+            <li>What's causing the tension behind the tension? <span class="citation">[cite: 76]</span></li>
+            <li>Is there other information that might explain the behaviour that I haven't considered? <span class="citation">[cite: 77]</span></li>
+        </ul>
+        <p>Now I can't get to exact fundamental first principles. But by asking these probing questions I can get a lot closer to the truth than if I didn't <span class="citation">[cite: 78]</span>. At the very least, it helps me understand the situation better and see it from different perspectives <span class="citation">[cite: 79]</span>.</p>
+
+        <h3>Be ruthlessly objective <span class="citation">[cite: 80]</span></h3>
+        <p>When we think reactively, and outsource our thinking, our mind is clouded with confirmation bias, incorrect judgments, and often emotional influence <span class="citation">[cite: 81]</span>. When thinking actively and intentionally, we want to remove as much of that as possible and see things for how they are <span class="citation">[cite: 82]</span>. The first principles thinking helps with this, but you also want to make sure that you're not getting in your own way <span class="citation">[cite: 83]</span>. A good question to ask is: "Is this true, or do I just want it to be?" <span class="citation">[cite: 84]</span> And also: "What's the WHOLE truth here? What am I neglecting to consider?" <span class="citation">[cite: 85]</span></p>
+
+        <p>The second question is crucial. When I was thinking about city vs country living, I kept convincing myself that living in the country would be so much better because of various reasons such as more relaxed environment, natural surroundings, more land to do stuff on, cleaner air... you get the idea <span class="citation">[cite: 86]</span>. But in these periods where I reactively thought about this and tried convincing myself, I often failed to look at the whole picture-to look at the negatives <span class="citation">[cite: 87]</span>.</p>
         
-        <div class="button-group">
-            <button onclick="playAudio()">Play</button>
-            <button onclick="pauseAudio()">Pause</button>
-            <button class="stop-btn" onclick="stopAudio()">Stop</button>
+        <p>The downsides of country living like: <span class="citation">[cite: 88]</span></p>
+        <ul>
+            <li>Further away from all the action. Harder to build relationships with people our age <span class="citation">[cite: 89]</span>.</li>
+            <li>Slower pace - doesn't fit my style that well <span class="citation">[cite: 90]</span>.</li>
+            <li>Time-consuming having to fix stuff etc <span class="citation">[cite: 91]</span>.</li>
+        </ul>
+        <p>And a bunch of other downsides <span class="citation">[cite: 92]</span>. So you want to make sure you're being ruthlessly objective and looking at the entire decision or problem that you're faced with, including the downsides <span class="citation">[cite: 93]</span>.</p>
+
+        <h3>Think through second & third order consequences <span class="citation">[cite: 94]</span></h3>
+        <p>One powerful principle is to not just think about the immediate consequences of a decision you make or a problem you solve, but the flow on effects and consequences from that <span class="citation">[cite: 94]</span>. For example, let's go back to the employee who's causing tension <span class="citation">[cite: 95]</span>. Maybe I hate conflict. I want to resolve that conflict. My emotions are speaking louder than my intellect <span class="citation">[cite: 96]</span>. So I make the decision to keep the employee on, but tell him to play nice <span class="citation">[cite: 97]</span>.</p>
+
+        <p>The first-order of consequence is that I've resolved the conflict I'm facing <span class="citation">[cite: 98]</span>. I no longer have to make the hard decision. And likely for a few days or weeks, everything's good <span class="citation">[cite: 99]</span>. But it's highly likely that the second-order consequence of this decision is that I'm faced with the same problem soon after <span class="citation">[cite: 100]</span>. The employee is causing tension again because that's just who he is <span class="citation">[cite: 101]</span>. Out of ignorance or simply because I didn't want to, I didn't think through this second-order consequence, and now I have to make the decision again about whether to fire him or keep him on <span class="citation">[cite: 102]</span>.</p>
+
+        <p>It's worth mentioning that while this is a powerful principle and you should do it, there's not much use in going down the rabbithole of consequences-which is infinite and impossible to predict <span class="citation">[cite: 103]</span>. But at least think through what could likely happen as a result of what you do <span class="citation">[cite: 104]</span>.</p>
+
+        <h3>Stick with it for some time <span class="citation">[cite: 105]</span></h3>
+        <p>If it's a big problem, decision, or idea that you need to think through-then stick with it for some time <span class="citation">[cite: 106]</span>. Sometimes you only need 30 minutes <span class="citation">[cite: 107]</span>. Other times you need days <span class="citation">[cite: 108]</span>. And occasionally you need weeks <span class="citation">[cite: 109]</span>. Take breaks. Let your thinking work in the background. Go for walks <span class="citation">[cite: 110]</span>. Come back to it <span class="citation">[cite: 111]</span>. But when I say stick with it for some time, I really mean STICK with it <span class="citation">[cite: 112]</span>. Don't have one thinking session and then abandon it for weeks on end <span class="citation">[cite: 113]</span>. Let it penetrate your mind on a daily basis so that insights and solutions come to you <span class="citation">[cite: 114]</span>.</p>
+
+        <h3>Once you've hit diminishing returns, start outsourcing <span class="citation">[cite: 115]</span></h3>
+        <p>You'll often find that you don't need to consult Google or seek the opinions of others <span class="citation">[cite: 115]</span>. But sometimes you'll be dealing with a situation, a problem, an idea, and you're completely stuck and need some fresh insight <span class="citation">[cite: 116]</span>. When you're at that point, it's then that you should look for other answers and leverage the thinking that others have already done <span class="citation">[cite: 117]</span>.</p>
+    </main>
+
+    <audio id="audioElement" src="audio1.mp3"></audio>
+
+    <div class="audio-container">
+        <div class="player-top-row">
+            <div class="controls">
+                <button id="playPauseBtn" onclick="togglePlayPause()">Play</button>
+                <button id="stopBtn" onclick="stopAudio()">Stop</button>
+            </div>
+            
+            <div class="volume-control">
+                <span class="volume-icon">🔊</span>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" oninput="setVolume()">
+            </div>
         </div>
 
-        <div class="volume-container">
-            <span>Volume</span>
-            <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+        <div class="slider-group">
+            <span id="currentTimeDisplay">0:00</span>
+            <input type="range" id="progressSlider" min="0" max="100" value="0" oninput="seekAudio()">
+            <span id="durationDisplay">0:00</span>
         </div>
     </div>
-</div>
 
-<script>
-    const audio = document.getElementById('myAudio');
-    const progressBar = document.getElementById('progressBar');
-    const volumeSlider = document.getElementById('volumeSlider');
+    <script>
+        const audio = document.getElementById('audioElement');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progressSlider = document.getElementById('progressSlider');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        const durationDisplay = document.getElementById('durationDisplay');
 
-    // Play/Resume
-    function playAudio() {
-        audio.play();
-    }
-
-    // Pause
-    function pauseAudio() {
-        audio.pause();
-    }
-
-    // Stop (Pause + Reset time)
-    function stopAudio() {
-        audio.pause();
-        audio.currentTime = 0;
-    }
-
-    // Update Progress Bar as audio plays
-    audio.addEventListener('timeupdate', () => {
-        if (audio.duration) {
-            const progress = (audio.currentTime / audio.duration) * 100;
-            progressBar.value = progress;
+        // Toggle Play / Pause / Resume
+        function togglePlayPause() {
+            if (audio.paused || audio.ended) {
+                audio.play();
+                playPauseBtn.textContent = 'Pause';
+            } else {
+                audio.pause();
+                playPauseBtn.textContent = 'Resume';
+            }
         }
-    });
 
-    // Seek functionality
-    progressBar.addEventListener('input', () => {
-        const seekTime = (progressBar.value / 100) * audio.duration;
-        audio.currentTime = seekTime;
-    });
+        // Stop Audio
+        function stopAudio() {
+            audio.pause();
+            audio.currentTime = 0;
+            playPauseBtn.textContent = 'Play';
+            progressSlider.value = 0;
+            currentTimeDisplay.textContent = '0:00';
+        }
 
-    // Volume Control
-    volumeSlider.addEventListener('input', (e) => {
-        audio.volume = e.target.value;
-    });
+        // Set Volume
+        function setVolume() {
+            audio.volume = volumeSlider.value;
+        }
 
-    // Ensure slider max updates when metadata loads
-    audio.addEventListener('loadedmetadata', () => {
-        progressBar.max = 100;
-    });
-</script>
+        // Seek Audio using Progress Slider
+        function seekAudio() {
+            const seekTime = (audio.duration * (progressSlider.value / 100));
+            audio.currentTime = seekTime;
+        }
+
+        // Format Time Output (MM:SS)
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Event Listener: Update progress slider and time display as audio plays
+        audio.addEventListener('timeupdate', () => {
+            if (!isNaN(audio.duration)) {
+                const progressPercent = (audio.currentTime / audio.duration) * 100;
+                progressSlider.value = progressPercent;
+                currentTimeDisplay.textContent = formatTime(audio.currentTime);
+            }
+        });
+
+        // Event Listener: Set total duration display once metadata loads
+        audio.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(audio.duration);
+        });
+
+        // Event Listener: Reset UI when audio finishes playing
+        audio.addEventListener('ended', () => {
+            playPauseBtn.textContent = 'Play';
+            progressSlider.value = 0;
+            currentTimeDisplay.textContent = '0:00';
+        });
+    </script>
 
 </body>
 </html>
